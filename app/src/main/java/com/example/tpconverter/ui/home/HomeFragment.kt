@@ -6,12 +6,9 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import com.example.tpconverter.R
-import com.example.tpconverter.adapter.RateAdapter
 import com.example.tpconverter.databinding.FragmentHomeBinding
-import com.example.tpconverter.model.Rate
+import com.example.tpconverter.json.RateConverter
+import fr.cs2i.rateconverterkt.io.IoUtil
 
 class HomeFragment : Fragment() {
 
@@ -32,7 +29,9 @@ class HomeFragment : Fragment() {
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
-        displayRates()
+
+        RateConverter.convertRates(getRates())
+
 
         return root
     }
@@ -42,21 +41,18 @@ class HomeFragment : Fragment() {
         _binding = null
     }
 
-    private fun getRates(): MutableList<Rate> {
-        val list = mutableListOf<Rate>()
-        for (i in 1..50) {
-            list.add(Rate(1, "EUR", "Euro", 1.0, "eur"))
-            list.add(Rate(2, "USD", "United States Dollar", 1.1, "usd"))
-        }
-        return list
+
+    private fun getRates(): String {
+        return IoUtil.readTextFile(
+            requireContext(),
+            "data/rates.json"
+        )
     }
 
-    private fun displayRates() {
-        val rateList: RecyclerView = binding.rateRecyclerView
-        val rates = getRates()
-        val adapter = RateAdapter(requireContext(), rates)
-        rateList.adapter = adapter
-        rateList.layoutManager = LinearLayoutManager(requireContext())
-
+    private fun getCurrencies(): String {
+        return IoUtil.readTextFile(
+            requireContext(),
+            "data/currencies.json"
+        )
     }
 }
